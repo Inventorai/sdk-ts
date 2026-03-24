@@ -1,0 +1,1 @@
+{"version":3,"file":"compliance-forms.d.ts","sourceRoot":"","sources":["../../src/resources/compliance-forms.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,UAAU,EAAE,MAAM,gBAAgB,CAAC;AAC5C,OAAO,EAAE,cAAc,EAAE,iBAAiB,EAAE,UAAU,EAAE,MAAM,UAAU,CAAC;AAEzE,qBAAa,eAAe;IACd,OAAO,CAAC,IAAI;gBAAJ,IAAI,EAAE,UAAU;IAE9B,IAAI,CAAC,MAAM,GAAE,UAAe,GAAG,OAAO,CAAC,iBAAiB,CAAC,cAAc,CAAC,CAAC;CAGhF"}
