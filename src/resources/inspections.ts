@@ -19,6 +19,18 @@ export class Inspections {
     return this.http.post('/inspections', data);
   }
 
+  async initialize(data: Record<string, any>): Promise<{ data: Inspection }> {
+    return this.http.post('/inspections/initialize', data);
+  }
+
+  async takeOver(inspectionId: number | string): Promise<{ data: Inspection }> {
+    return this.http.post(`/inspections/${inspectionId}/take-over`);
+  }
+
+  async takeBackToWeb(inspectionId: number | string): Promise<{ data: Inspection }> {
+    return this.http.post(`/inspections/${inspectionId}/take-back-to-web`);
+  }
+
   async checkExisting(params: Record<string, any>): Promise<any> {
     return this.http.get('/inspections/check-existing', params);
   }

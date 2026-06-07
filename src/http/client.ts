@@ -5,7 +5,7 @@ import { ListParams } from '../types';
 export class HttpClient {
   private client: AxiosInstance;
 
-  constructor(apiToken: string, baseURL: string = 'https://api.inventorai.co.uk/v1') {
+  constructor(apiToken: string, baseURL: string = 'https://api.inventorai.co.uk/v1/team') {
     this.client = axios.create({
       baseURL,
       headers: {

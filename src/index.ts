@@ -15,6 +15,8 @@ export { Compliance } from './resources/compliance';
 export { ComplianceForms } from './resources/compliance-forms';
 export { InspectionAi } from './resources/inspection-ai';
 export { PropertyTemplates } from './resources/property-templates';
+export { Branches } from './resources/branches';
+export { Hmo, HmoTenantAssignment, HmoBulkAssignment } from './resources/hmo';
 export { Components } from './resources/components';
 export { UserResource } from './resources/user';
 export { AddressLookup } from './resources/address-lookup';

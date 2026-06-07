@@ -195,17 +195,46 @@ export interface Inspection {
 }
 
 export interface CreateInspectionData {
+  id?: string;
   property_id: number;
   tenancy_id?: number;
   type: InspectionType;
   inspection_date?: string;
   inspection_time?: string;
   inspection_end_time?: string;
+  scheduled_end_at?: string;
   inspector_id?: number;
   comparison_inspection_id?: number;
   is_comparison?: boolean;
   duplicate_media?: boolean;
   ai_mode_enabled?: boolean;
+  areas?: CreateInspectionAreaTree[];
+}
+
+export interface CreateInspectionAreaTree {
+  id: string;
+  name: string;
+  category?: string;
+  order?: number;
+  property_area_id?: string;
+  items?: CreateInspectionItemTree[];
+}
+
+export interface CreateInspectionItemTree {
+  id: string;
+  name: string;
+  category?: string;
+  order?: number;
+  property_item_id?: string;
+  elements?: CreateInspectionElementTree[];
+}
+
+export interface CreateInspectionElementTree {
+  id: string;
+  name: string;
+  category?: string;
+  order?: number;
+  property_element_id?: string;
 }
 
 export interface RescheduleInspectionData {
@@ -379,7 +408,8 @@ export interface Defect {
   title: string;
   description?: string;
   location_notes?: string;
-  severity?: DefectSeverity;
+  severity?: DefectSeverity | null;
+  item_label?: string | null;
   category?: string;
   status: DefectStatus;
   order?: number;
@@ -400,7 +430,8 @@ export interface CreateDefectData {
   title: string;
   description?: string;
   location_notes?: string;
-  severity?: DefectSeverity;
+  severity?: DefectSeverity | null;
+  item_label?: string | null;
   category?: string;
   photo_ids?: string[];
 }
@@ -409,7 +440,8 @@ export interface UpdateDefectData {
   title?: string;
   description?: string;
   location_notes?: string;
-  severity?: DefectSeverity;
+  severity?: DefectSeverity | null;
+  item_label?: string | null;
   category?: string;
   status?: DefectStatus;
   photo_ids?: string[];
@@ -566,6 +598,25 @@ export interface ComplianceSectionInstance {
   instance_label?: string;
   order: number;
   responses?: ComplianceResponse[];
+  created_at: string;
+  updated_at: string;
+}
+
+// === Branch Types ===
+
+export interface Branch {
+  id: number;
+  team_id: number;
+  name: string;
+  slug?: string;
+  is_default?: boolean;
+  address_line_1?: string;
+  address_line_2?: string;
+  city?: string;
+  postcode?: string;
+  country?: string;
+  phone?: string;
+  email?: string;
   created_at: string;
   updated_at: string;
 }

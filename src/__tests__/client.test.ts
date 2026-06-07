@@ -11,6 +11,8 @@ import { Compliance } from '../resources/compliance';
 import { ComplianceForms } from '../resources/compliance-forms';
 import { InspectionAi } from '../resources/inspection-ai';
 import { PropertyTemplates } from '../resources/property-templates';
+import { Branches } from '../resources/branches';
+import { Hmo } from '../resources/hmo';
 import { Components } from '../resources/components';
 import { UserResource } from '../resources/user';
 import { AddressLookup } from '../resources/address-lookup';
@@ -89,6 +91,14 @@ describe('InventoraiClient', () => {
       expect(client.propertyTemplates).toBeInstanceOf(PropertyTemplates);
     });
 
+    it('has a branches resource', () => {
+      expect(client.branches).toBeInstanceOf(Branches);
+    });
+
+    it('has an hmo resource', () => {
+      expect(client.hmo).toBeInstanceOf(Hmo);
+    });
+
     it('has a components resource', () => {
       expect(client.components).toBeInstanceOf(Components);
     });
@@ -132,6 +142,8 @@ describe('InventoraiClient', () => {
       client.complianceForms,
       client.inspectionAi,
       client.propertyTemplates,
+      client.branches,
+      client.hmo,
       client.components,
       client.user,
       client.addressLookup,

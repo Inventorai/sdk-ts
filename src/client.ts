@@ -11,6 +11,8 @@ import { Compliance } from './resources/compliance';
 import { ComplianceForms } from './resources/compliance-forms';
 import { InspectionAi } from './resources/inspection-ai';
 import { PropertyTemplates } from './resources/property-templates';
+import { Branches } from './resources/branches';
+import { Hmo } from './resources/hmo';
 import { Components } from './resources/components';
 import { UserResource } from './resources/user';
 import { AddressLookup } from './resources/address-lookup';
@@ -39,6 +41,8 @@ export class InventoraiClient {
   public complianceForms: ComplianceForms;
   public inspectionAi: InspectionAi;
   public propertyTemplates: PropertyTemplates;
+  public branches: Branches;
+  public hmo: Hmo;
   public components: Components;
   public user: UserResource;
   public addressLookup: AddressLookup;
@@ -48,7 +52,7 @@ export class InventoraiClient {
   public scheduler: Scheduler;
 
   constructor(options: InventoraiClientOptions) {
-    const baseURL = options.baseURL || 'https://api.inventorai.co.uk/v1';
+    const baseURL = options.baseURL || 'https://api.inventorai.co.uk/v1/team';
     this.httpClient = new HttpClient(options.apiToken, baseURL);
 
     this.properties = new Properties(this.httpClient);
@@ -63,6 +67,8 @@ export class InventoraiClient {
     this.complianceForms = new ComplianceForms(this.httpClient);
     this.inspectionAi = new InspectionAi(this.httpClient);
     this.propertyTemplates = new PropertyTemplates(this.httpClient);
+    this.branches = new Branches(this.httpClient);
+    this.hmo = new Hmo(this.httpClient);
     this.components = new Components(this.httpClient);
     this.user = new UserResource(this.httpClient);
     this.addressLookup = new AddressLookup(this.httpClient);

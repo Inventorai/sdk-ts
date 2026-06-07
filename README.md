@@ -47,12 +47,12 @@ const property = await client.properties.create({
 
 ### Base URL
 
-By default, the SDK uses `https://api.inventorai.co.uk/v1`. You can override this:
+By default, the SDK uses `https://api.inventorai.co.uk/v1/team` — the third-party Team API surface, authenticated with a team API token. Override for local development:
 
 ```typescript
 const client = new InventoraiClient({
   apiToken: 'your-api-token',
-  baseURL: 'https://api.inventorai.co.uk/v1'
+  baseURL: 'https://api.inventorai.test/v1/team'
 });
 ```
 
@@ -107,6 +107,31 @@ const inspection = await client.inspections.create({
   ai_mode_enabled: true
 });
 
+// Create with offline-built ULID + nested tree (sync a full structure in one call,
+// reusing your own row IDs so offline mutations stay valid post-sync)
+const offlineInspection = await client.inspections.create({
+  id: '01HZW4N8R7Q5K3JX0V9PT6S2EM',
+  property_id: 123,
+  type: 'periodic',
+  scheduled_end_at: '2026-04-01T11:00:00Z',
+  areas: [{
+    id: '01HZW4N8R7Q5K3JX0V9PT6S2A1',
+    name: 'Living Room',
+    items: [{
+      id: '01HZW4N8R7Q5K3JX0V9PT6S2I1',
+      name: 'Sofa',
+      elements: [{ id: '01HZW4N8R7Q5K3JX0V9PT6S2E1', name: 'Cushion' }]
+    }]
+  }]
+});
+
+// Initialize from a property template (async server-side expansion)
+await client.inspections.initialize({
+  property_id: 123,
+  template_id: 7,
+  type: 'move_in'
+});
+
 // Get inspection with nested data
 const detail = await client.inspections.get(456, {
   include: ['areas', 'items', 'elements', 'defects']
@@ -114,6 +139,8 @@ const detail = await client.inspections.get(456, {
 
 // Lifecycle
 await client.inspections.begin(456);
+await client.inspections.takeOver(456);          // claim an inspection locked by another inspector
+await client.inspections.takeBackToWeb(456);     // hand a mobile-takeover inspection back to the web UI
 await client.inspections.reschedule(456, { inspection_date: '2026-04-15' });
 await client.inspections.finalize(456);
 
@@ -170,13 +197,16 @@ await client.inspectionElements.uploadPhoto(inspectionId, elementId, photoFile);
 ```typescript
 const defects = await client.defects.list(inspectionId);
 const defect = await client.defects.create(inspectionId, {
-  defectable_type: 'item', defectable_id: itemId,
-  title: 'Scratch on surface', severity: 'minor'
+  defectable_type: 'item',
+  defectable_id: itemId,
+  title: 'Scratch on surface',
+  severity: 'minor',           // nullable — omit if uncategorised
+  item_label: 'Top-left drawer' // optional free-text label for the affected part
 });
 
 // Contextual creation
 await client.defects.createForArea(inspectionId, areaId, { title: 'Damp patch', severity: 'major' });
-await client.defects.createForItem(inspectionId, itemId, { title: 'Broken handle', severity: 'moderate' });
+await client.defects.createForItem(inspectionId, itemId, { title: 'Broken handle', severity: 'moderate', item_label: 'Right side' });
 await client.defects.createForElement(inspectionId, elementId, { title: 'Stain', severity: 'cosmetic' });
 
 await client.defects.update(inspectionId, defectId, { status: 'fixed' });
@@ -257,6 +287,33 @@ const templates = await client.propertyTemplates.list();
 const template = await client.propertyTemplates.get(789);
 ```
 
+### Branches
+
+```typescript
+const branches = await client.branches.list();
+const branch = await client.branches.get(1);
+```
+
+### HMO (House in Multiple Occupation)
+
+```typescript
+const summary = await client.hmo.summary(inspectionId);
+const tenants = await client.hmo.tenants(inspectionId);
+
+await client.hmo.assignTenantToArea(inspectionId, areaId, {
+  tenant_ids: ['tenant-1', 'tenant-2'],
+  is_shared: false,
+  room_identifier: 'Room 1'
+});
+
+await client.hmo.bulkAssignTenants(inspectionId, {
+  assignments: [
+    { area_id: 'area-1', tenant_ids: ['tenant-1'] },
+    { area_id: 'area-2', is_shared: true }
+  ]
+});
+```
+
 ### Components
 
 ```typescript
@@ -332,8 +389,12 @@ Full type definitions are included:
 ```typescript
 import {
   Property, Inspection, InspectionArea, InspectionItem, InspectionElement,
-  Defect, MeterReading, KeyFob, ComplianceForm, PropertyTemplate,
-  CreatePropertyData, CreateInspectionData, PaginatedResponse
+  Defect, MeterReading, KeyFob, ComplianceForm, PropertyTemplate, Branch,
+  CreatePropertyData, CreateInspectionData,
+  CreateInspectionAreaTree, CreateInspectionItemTree, CreateInspectionElementTree,
+  CreateDefectData, UpdateDefectData,
+  HmoTenantAssignment, HmoBulkAssignment,
+  PaginatedResponse
 } from '@inventorai/sdk';
 ```
 

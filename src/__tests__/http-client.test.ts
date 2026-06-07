@@ -33,7 +33,7 @@ describe('HttpClient', () => {
     it('creates an axios instance with default baseURL', () => {
       expect(mockedAxios.create).toHaveBeenCalledWith(
         expect.objectContaining({
-          baseURL: 'https://api.inventorai.co.uk/v1',
+          baseURL: 'https://api.inventorai.co.uk/v1/team',
           headers: expect.objectContaining({
             Authorization: 'Bearer test-token',
             Accept: 'application/json',
