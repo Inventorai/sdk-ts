@@ -20,6 +20,7 @@ import { StatsResource } from './resources/stats';
 import { Phrases } from './resources/phrases';
 import { Modifiers } from './resources/modifiers';
 import { Scheduler } from './resources/scheduler';
+import { TeamResource } from './resources/team';
 
 export interface InventoraiClientOptions {
   apiToken: string;
@@ -50,6 +51,7 @@ export class InventoraiClient {
   public phrases: Phrases;
   public modifiers: Modifiers;
   public scheduler: Scheduler;
+  public team: TeamResource;
 
   constructor(options: InventoraiClientOptions) {
     const baseURL = options.baseURL || 'https://api.inventorai.co.uk/v1/team';
@@ -76,5 +78,6 @@ export class InventoraiClient {
     this.phrases = new Phrases(this.httpClient);
     this.modifiers = new Modifiers(this.httpClient);
     this.scheduler = new Scheduler(this.httpClient);
+    this.team = new TeamResource(this.httpClient);
   }
 }

@@ -655,23 +655,41 @@ export interface Component {
 
 // === Team Types ===
 
+export interface TeamAddress {
+  line_1: string | null;
+  line_2: string | null;
+  city: string | null;
+  county: string | null;
+  postcode: string | null;
+  country: string | null;
+}
+
+export interface TeamSubscription {
+  subscribed: boolean;
+  on_trial: boolean;
+  on_grace_period: boolean;
+  stripe_status: string | null;
+  trial_ends_at: string | null;
+  bypasses_subscription: boolean;
+}
+
 export interface Team {
-  id: number;
+  id: string;
   name: string;
-  slug?: string;
-  business_type?: string;
-  email?: string;
-  phone?: string;
-  website?: string;
-  address?: Address;
-  logo_url?: string;
-  primary_color?: string;
-  subscription?: { tier: string; status: string };
-  condition_options?: any;
-  cleanliness_options?: any;
-  inspection_settings?: any;
-  inspection_hours?: any;
-  created_at: string;
+  slug: string;
+  business_type: string | null;
+  email: string | null;
+  phone: string | null;
+  website: string | null;
+  address: TeamAddress;
+  logo_url: string | null;
+  primary_color: string | null;
+  subscription: TeamSubscription;
+  condition_options: Array<Record<string, any>>;
+  cleanliness_options: Array<Record<string, any>>;
+  inspection_settings: Record<string, any>;
+  inspection_hours: Record<string, any>;
+  created_at: string | null;
 }
 
 // === User Types ===

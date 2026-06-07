@@ -24,3 +24,4 @@ export { StatsResource } from './resources/stats';
 export { Phrases } from './resources/phrases';
 export { Modifiers } from './resources/modifiers';
 export { Scheduler } from './resources/scheduler';
+export { TeamResource } from './resources/team';
