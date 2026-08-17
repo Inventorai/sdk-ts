@@ -160,6 +160,8 @@ await client.inspections.takeOver(456);          // claim an inspection locked b
 await client.inspections.takeBackToWeb(456);     // hand a mobile-takeover inspection back to the web UI
 await client.inspections.reschedule(456, { inspection_date: '2026-04-15' });
 await client.inspections.finalize(456);
+await client.inspections.reopen(456);            // reopen a finalised inspection for edits
+await client.inspections.delete(456);
 
 // Check existing / comparable
 const existing = await client.inspections.checkExisting({ property_id: 123, type: 'move_in' });
@@ -375,12 +377,27 @@ const forItem = await client.modifiers.forItem({ item_name: 'Sofa' });
 const search = await client.modifiers.search({ q: 'leather' });
 const disabled = await client.modifiers.disabled();
 const master = await client.modifiers.master();
+const sync = await client.modifiers.sync();      // full snapshot for offline caches
 
 await client.modifiers.createCustom({ type: 'brand', value: 'IKEA' });
 await client.modifiers.deleteCustom(modifierId);
 await client.modifiers.disable(modifierId);
 await client.modifiers.enable(modifierId);
 const composed = await client.modifiers.compose({ items: ['Brown', 'Leather', 'Sofa'] });
+```
+
+### Asset Checks
+
+Alarm and safety-equipment checks recorded against an inspection.
+
+```typescript
+await client.assetChecks.update(inspectionId, assetCheckId, {
+  tested: 'yes',           // yes | no | not_accessible
+  test_result: 'pass',     // pass | fail | na
+  condition: 'good',       // good | fair | poor | replace
+  notes: 'Sounded on test',
+});
+await client.assetChecks.uploadPhoto(inspectionId, assetCheckId, photoFile);
 ```
 
 ### Scheduler
@@ -391,12 +408,6 @@ await client.scheduler.weeklyAvailability(data);
 const conflicts = await client.scheduler.checkConflicts(data);
 const hours = await client.scheduler.officeHours();
 const duration = await client.scheduler.estimateDuration(data);
-```
-
-### User
-
-```typescript
-const user = await client.user.me();
 ```
 
 ## TypeScript Support

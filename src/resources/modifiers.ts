@@ -47,4 +47,8 @@ export class Modifiers {
   async compose(data: any): Promise<any> {
     return this.http.post('/modifiers/compose', data);
   }
+
+  async sync(params?: Record<string, any>): Promise<any> {
+    return this.http.get('/modifiers/sync', params);
+  }
 }

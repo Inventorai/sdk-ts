@@ -121,4 +121,18 @@ describe('Inspections', () => {
       expect(mockHttp.delete).toHaveBeenCalledWith('/inspections/10/cover-image');
     });
   });
+
+  describe('reopen', () => {
+    it('calls POST /inspections/:id/reopen', async () => {
+      await inspections.reopen(10);
+      expect(mockHttp.post).toHaveBeenCalledWith('/inspections/10/reopen');
+    });
+  });
+
+  describe('delete', () => {
+    it('calls DELETE /inspections/:id', async () => {
+      await inspections.delete(10);
+      expect(mockHttp.delete).toHaveBeenCalledWith('/inspections/10');
+    });
+  });
 });

@@ -14,7 +14,6 @@ import { PropertyTemplates } from '../resources/property-templates';
 import { Branches } from '../resources/branches';
 import { Hmo } from '../resources/hmo';
 import { Components } from '../resources/components';
-import { UserResource } from '../resources/user';
 import { AddressLookup } from '../resources/address-lookup';
 import { StatsResource } from '../resources/stats';
 import { Phrases } from '../resources/phrases';
@@ -103,10 +102,6 @@ describe('InventoraiClient', () => {
       expect(client.components).toBeInstanceOf(Components);
     });
 
-    it('has a user resource', () => {
-      expect(client.user).toBeInstanceOf(UserResource);
-    });
-
     it('has an addressLookup resource', () => {
       expect(client.addressLookup).toBeInstanceOf(AddressLookup);
     });
@@ -145,7 +140,6 @@ describe('InventoraiClient', () => {
       client.branches,
       client.hmo,
       client.components,
-      client.user,
       client.addressLookup,
       client.stats,
       client.phrases,

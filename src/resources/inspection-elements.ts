@@ -27,10 +27,6 @@ export class InspectionElements {
     return this.http.delete(`/inspections/${inspectionId}/elements/${elementId}`);
   }
 
-  async duplicate(inspectionId: number | string, elementId: string): Promise<{ data: InspectionElement }> {
-    return this.http.post(`/inspections/${inspectionId}/elements/${elementId}/duplicate`);
-  }
-
   async uploadPhoto(inspectionId: number | string, elementId: string, file: File | Blob | Buffer): Promise<any> {
     return this.http.upload(`/inspections/${inspectionId}/elements/${elementId}/photos`, file, 'photo');
   }

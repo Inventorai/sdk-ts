@@ -58,4 +58,12 @@ export class Inspections {
   async deleteCoverImage(inspectionId: number | string): Promise<void> {
     return this.http.delete(`/inspections/${inspectionId}/cover-image`);
   }
+
+  async reopen(inspectionId: number | string): Promise<{ data: Inspection }> {
+    return this.http.post(`/inspections/${inspectionId}/reopen`);
+  }
+
+  async delete(inspectionId: number | string): Promise<void> {
+    return this.http.delete(`/inspections/${inspectionId}`);
+  }
 }

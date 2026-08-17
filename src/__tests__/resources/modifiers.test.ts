@@ -110,4 +110,11 @@ describe('Modifiers', () => {
       expect(mockHttp.post).toHaveBeenCalledWith('/modifiers/compose', data);
     });
   });
+
+  describe('sync', () => {
+    it('calls GET /modifiers/sync', async () => {
+      await modifiers.sync();
+      expect(mockHttp.get).toHaveBeenCalledWith('/modifiers/sync', undefined);
+    });
+  });
 });
