@@ -1,4 +1,5 @@
-export { InventoraiClient, InventoraiClientOptions } from './client';
+export { InventoraiClient } from './client';
+export type { InventoraiClientOptions } from './client';
 export * from './types';
 export * from './errors/api-error';
 
@@ -17,7 +18,8 @@ export { ComplianceForms } from './resources/compliance-forms';
 export { InspectionAi } from './resources/inspection-ai';
 export { PropertyTemplates } from './resources/property-templates';
 export { Branches } from './resources/branches';
-export { Hmo, HmoTenantAssignment, HmoBulkAssignment } from './resources/hmo';
+export { Hmo } from './resources/hmo';
+export type { HmoTenantAssignment, HmoBulkAssignment } from './resources/hmo';
 export { Components } from './resources/components';
 export { AddressLookup } from './resources/address-lookup';
 export { StatsResource } from './resources/stats';

@@ -1,5 +1,5 @@
 import { HttpClient } from '../http/client';
-import { Modifier, CreateCustomModifierData, ModifierType } from '../types';
+import { Modifier, CreateCustomModifierData } from '../types';
 
 export class Modifiers {
   constructor(private http: HttpClient) {}
