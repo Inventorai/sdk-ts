@@ -39,7 +39,7 @@ const property = await client.properties.create({
   postcode: 'SW1A 1AA',
   country: 'GB',
   property_type: 'flat',
-  residential: true
+  is_residential: true
 });
 ```
 
@@ -80,7 +80,7 @@ const newProperty = await client.properties.create({
   postcode: 'SW1A 2AA',
   country: 'GB',
   property_type: 'house',
-  residential: true
+  is_residential: true
 });
 
 // Get active tenancy
@@ -103,7 +103,7 @@ const inspections = await client.inspections.list({
 const inspection = await client.inspections.create({
   property_id: 123,
   type: 'move_in',
-  inspection_date: '2026-04-01',
+  scheduled_at: '2026-04-01',
   ai_mode_enabled: true
 });
 
@@ -158,7 +158,7 @@ const detail = await client.inspections.get(456, {
 await client.inspections.begin(456);
 await client.inspections.takeOver(456);          // claim an inspection locked by another inspector
 await client.inspections.takeBackToWeb(456);     // hand a mobile-takeover inspection back to the web UI
-await client.inspections.reschedule(456, { inspection_date: '2026-04-15' });
+await client.inspections.reschedule(456, { scheduled_at: '2026-04-15' });
 await client.inspections.finalize(456);
 await client.inspections.reopen(456);            // reopen a finalised inspection for edits
 await client.inspections.delete(456);

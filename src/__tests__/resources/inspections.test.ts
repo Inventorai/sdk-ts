@@ -53,7 +53,7 @@ describe('Inspections', () => {
       const data = {
         property_id: 1,
         type: 'move_in' as const,
-        inspection_date: '2026-04-01',
+        scheduled_at: '2026-04-01',
       };
       await inspections.create(data);
       expect(mockHttp.post).toHaveBeenCalledWith('/inspections', data);
@@ -99,7 +99,7 @@ describe('Inspections', () => {
   describe('reschedule', () => {
     it('calls PATCH /inspections/:id/reschedule with data', async () => {
       const data = {
-        inspection_date: '2026-05-01',
+        scheduled_at: '2026-05-01',
         inspection_time: '10:00',
       };
       await inspections.reschedule(10, data);

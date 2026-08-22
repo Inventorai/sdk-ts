@@ -60,7 +60,7 @@ describe('Properties', () => {
         postcode: 'SW1A 1AA',
         country: 'GB',
         property_type: 'house' as const,
-        residential: true,
+        is_residential: true,
       };
       await properties.create(data);
       expect(mockHttp.post).toHaveBeenCalledWith('/properties', data);

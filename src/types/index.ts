@@ -65,7 +65,7 @@ export interface Property {
   address: Address;
   location?: Location;
   property_type: PropertyType;
-  residential: boolean;
+  is_residential: boolean;
   notes?: string;
   certificates?: Record<string, Certificate>;
   landlord?: Landlord;
@@ -89,7 +89,7 @@ export interface CreatePropertyData {
   latitude?: string;
   longitude?: string;
   property_type: PropertyType;
-  residential: boolean;
+  is_residential: boolean;
 }
 
 export interface Landlord {
@@ -136,7 +136,7 @@ export interface Inspection {
   archived_at?: string;
   tenancy_id?: number;
   requires_tenancy: boolean;
-  inspection_date?: string;
+  scheduled_at?: string;
   inspection_time?: string;
   inspection_end_time?: string;
   inspection_depth?: string;
@@ -199,7 +199,7 @@ export interface CreateInspectionData {
   property_id: number;
   tenancy_id?: number;
   type: InspectionType;
-  inspection_date?: string;
+  scheduled_at?: string;
   inspection_time?: string;
   inspection_end_time?: string;
   scheduled_end_at?: string;
@@ -238,7 +238,7 @@ export interface CreateInspectionElementTree {
 }
 
 export interface RescheduleInspectionData {
-  inspection_date: string;
+  scheduled_at: string;
   inspection_time?: string;
   inspection_end_time?: string;
 }
@@ -457,7 +457,7 @@ export interface MeterReading {
   meter_serial?: string;
   reading?: number;
   reading_unit?: string;
-  reading_date?: string;
+  captured_at?: string;
   notes?: string;
   meter_balance?: number;
   is_prepaid: boolean;
@@ -473,7 +473,7 @@ export interface CreateMeterReadingData {
   meter_serial?: string;
   reading?: number;
   reading_unit?: string;
-  reading_date?: string;
+  captured_at?: string;
   notes?: string;
   meter_balance?: number;
   is_prepaid?: boolean;
@@ -485,7 +485,7 @@ export interface UpdateMeterReadingData {
   meter_serial?: string;
   reading?: number;
   reading_unit?: string;
-  reading_date?: string;
+  captured_at?: string;
   notes?: string;
   meter_balance?: number;
   is_prepaid?: boolean;
@@ -584,7 +584,7 @@ export interface ComplianceResponse {
   value_type: string;
   value: any;
   file?: { id: number; name: string; url: string; mime_type: string; size: number };
-  auto_populated: boolean;
+  is_auto_populated: boolean;
   created_at: string;
   updated_at: string;
 }
