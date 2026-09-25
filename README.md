@@ -47,7 +47,7 @@ const property = await client.properties.create({
 
 ### Base URL
 
-By default, the SDK uses `https://api.inventorai.co.uk/v1/team` — the third-party Team API surface, authenticated with a team API token. Override for local development:
+By default, the SDK uses `https://api.inventorai.co.uk/v1/team`, the third-party Team API surface, authenticated with a team API token. Override for local development:
 
 ```typescript
 const client = new InventoraiClient({
@@ -133,8 +133,8 @@ await client.inspections.initialize({
   type: 'move_in'
 });
 
-// Get with relations — one call returns the whole inspection tree.
-// You almost never need the per-resource list() methods below for *reads* —
+// Get with relations: one call returns the whole inspection tree.
+// You almost never need the per-resource list() methods below for *reads*:
 // pass everything you want through `include` and you'll get it inline.
 const detail = await client.inspections.get(456, {
   include: [
@@ -150,7 +150,7 @@ const detail = await client.inspections.get(456, {
 });
 
 // The per-resource sections below (Inspection Areas, Items, Elements, …)
-// are for **writes**: create, update, delete, duplicate, reorder, photo upload —
+// are for **writes**: create, update, delete, duplicate, reorder, photo upload.
 // and for mobile/offline sync where a client re-pulls one slice or pages a leaf
 // (e.g. an HMO inspection with hundreds of items). For normal reads, prefer the
 // `include` call above.
@@ -220,7 +220,7 @@ const defect = await client.defects.create(inspectionId, {
   defectable_type: 'item',
   defectable_id: itemId,
   title: 'Scratch on surface',
-  severity: 'minor',           // nullable — omit if uncategorised
+  severity: 'minor',           // nullable, omit if uncategorised
   item_label: 'Top-left drawer' // optional free-text label for the affected part
 });
 
