@@ -1,13 +1,16 @@
 // === Enums / Union Types ===
 
-export type PropertyType = 'flat' | 'house' | 'hmo' | 'studio' | 'commercial' | 'land';
+/** Building type. The API accepts any string; these are the known values. HMO status is `is_hmo`, not a type. */
+export type PropertyType = 'flat' | 'house' | 'commercial' | 'studio' | 'land' | (string & {});
+export type InspectionStatus = 'draft' | 'in_progress' | 'in_review' | 'pending_signature' | 'completed';
+export type ScribePolicy = 'off' | 'optional' | 'only';
 export type InspectionType = 'move_in' | 'move_out' | 'periodic' | 'vacant' | 'pre_tenancy' | 'landlord_only' | 'between_tenancies';
 export type Condition = 'very_poor' | 'poor' | 'fair' | 'good' | 'new';
 export type Cleanliness = 'dirty' | 'needs_cleaning' | 'acceptable' | 'clean' | 'very_clean';
 export type MeterType = 'gas' | 'electricity' | 'water' | 'other';
 export type KeyFobType = 'front_door_key' | 'back_door_key' | 'mailbox_key' | 'window_key' | 'entry_fob' | 'garage_remote' | 'gate_remote' | 'other';
-export type DefectSeverity = 'cosmetic' | 'minor' | 'moderate' | 'major' | 'critical';
-export type DefectStatus = 'open' | 'assigned' | 'fixed' | 'verified' | 'closed';
+export type DefectSeverity = 'low' | 'medium' | 'high' | 'critical';
+export type DefectStatus = 'open' | 'assigned' | 'in_progress' | 'awaiting_approval' | 'completed';
 export type DefectableType = 'area' | 'item' | 'element';
 export type ModifierType = 'brand' | 'size' | 'type' | 'accessory';
 export type PhraseCategory = 'area' | 'item' | 'element';
@@ -40,7 +43,7 @@ export interface Photo {
 }
 
 export interface Certificate {
-  id: number;
+  id: string;
   type: string;
   name: string;
   rating?: string;
@@ -61,11 +64,19 @@ export interface CoverImage {
 // === Property Types ===
 
 export interface Property {
-  id: number;
+  id: string;
+  branch_id?: string | null;
+  branch?: { id: string; name: string } | null;
+  client_id?: string | null;
+  client?: Client;
   address: Address;
   location?: Location;
   property_type: PropertyType;
+  is_hmo: boolean;
   is_residential: boolean;
+  areas?: Array<{ id: string; name: string; category?: string; is_assignable?: boolean; order?: number }>;
+  image_thumbnail?: string;
+  image_small?: string;
   notes?: string;
   certificates?: Record<string, Certificate>;
   landlord?: Landlord;
@@ -89,11 +100,13 @@ export interface CreatePropertyData {
   latitude?: string;
   longitude?: string;
   property_type: PropertyType;
+  is_hmo?: boolean;
   is_residential: boolean;
+  branch_id?: string | null;
 }
 
 export interface Landlord {
-  id: number;
+  id: string;
   name: string;
   type?: string;
   company_name?: string;
@@ -110,14 +123,14 @@ export interface Landlord {
 }
 
 export interface Tenancy {
-  id: number;
-  property_id: number;
+  id: string;
+  property_id: string;
   start_date: string;
   end_date?: string;
   status: string;
   notes?: string;
   hmo_configuration?: any;
-  lead_tenant?: { id: number; name: string; email: string };
+  lead_tenant?: { id: string; name: string; email: string };
   tenants_count?: number;
   created_at: string;
   updated_at: string;
@@ -126,23 +139,26 @@ export interface Tenancy {
 // === Inspection Types ===
 
 export interface Inspection {
-  id: number;
-  property_id: number;
+  id: string;
+  property_id: string;
   property?: Property;
-  inspector?: { id: number; name: string; email: string };
+  client_id?: string | null;
+  client?: Client;
+  inspector?: { id: string; name: string; email: string };
   type: InspectionType;
-  status: string;
+  status: InspectionStatus;
   is_archived: boolean;
   archived_at?: string;
-  tenancy_id?: number;
+  tenancy_id?: string;
+  tenancy?: Tenancy;
+  room_tenancy_ids?: string[];
   requires_tenancy: boolean;
   scheduled_at?: string;
-  inspection_time?: string;
-  inspection_end_time?: string;
+  scheduled_end_at?: string;
   inspection_depth?: string;
   elements_enabled: boolean;
-  baseline_inspection_id?: number;
-  previous_inspection_id?: number;
+  baseline_inspection_id?: string;
+  previous_inspection_id?: string;
   completion_requirements?: {
     require_ratings: boolean;
     require_photos: boolean;
@@ -152,27 +168,28 @@ export interface Inspection {
   };
   lock_status?: {
     status: string;
-    locked_by?: number;
+    locked_by?: { id: string; name?: string };
     device_name?: string;
     locked_at?: string;
     last_activity_at?: string;
   };
   finalized?: {
     at?: string;
-    by?: { id: number; name: string };
+    by?: { id: string; name: string };
   };
   statistics?: {
     total_defects: number;
     critical_defects: number;
     total_photos: number;
   };
-  ai_mode?: {
+  scribe: {
     enabled: boolean;
-    processing_status?: string;
-    photos_to_process?: number;
-    photos_processed?: number;
-    processing_started_at?: string;
-    processing_completed_at?: string;
+    policy: ScribePolicy;
+    processing_status?: string | null;
+    photos_to_process?: number | null;
+    photos_processed?: number | null;
+    processing_started_at?: string | null;
+    processing_completed_at?: string | null;
   };
   tenant_signatures?: {
     deadline?: string;
@@ -188,25 +205,31 @@ export interface Inspection {
   elements?: InspectionElement[];
   meter_readings?: MeterReading[];
   keys_fobs?: KeyFob[];
-  compliance_forms?: ComplianceForm[];
-  cover_image?: CoverImage;
+  compliance_forms?: Array<Record<string, any>>;
+  asset_checks?: InspectionAssetCheckGroup[];
+  cover_image?: CoverImage & { small_url?: string };
   created_at: string;
   updated_at: string;
 }
 
 export interface CreateInspectionData {
   id?: string;
-  property_id: number;
-  tenancy_id?: number;
+  property_id: string;
+  tenancy_id?: string;
   type: InspectionType;
   scheduled_at?: string;
   inspection_time?: string;
   inspection_end_time?: string;
   scheduled_end_at?: string;
-  inspector_id?: number;
-  comparison_inspection_id?: number;
+  inspector_id?: string;
+  comparison_inspection_id?: string;
   is_comparison?: boolean;
+  room_tenancy_ids?: string[];
+  room_comparison_map?: Record<string, string | null>;
+  occupancy_context?: 'tenancy_linked' | 'vacant' | 'pre_tenancy' | 'landlord_only' | 'between_tenancies';
   duplicate_media?: boolean;
+  scribe_enabled?: boolean;
+  /** @deprecated Use `scribe_enabled`. The API still maps it. */
   ai_mode_enabled?: boolean;
   areas?: CreateInspectionAreaTree[];
 }
@@ -247,11 +270,36 @@ export interface FinalizeInspectionData {
   [key: string]: any;
 }
 
+export interface InspectionAssetCheck {
+  id: string;
+  property_asset_id: string;
+  asset_type?: string | null;
+  asset_type_label?: string | null;
+  location_description?: string | null;
+  make?: string | null;
+  model?: string | null;
+  serial_number?: string | null;
+  tested?: any;
+  test_result?: string | null;
+  condition?: string | null;
+  notes?: string | null;
+  photos: Array<{ id: string; url: string; thumbnail_url: string }>;
+}
+
+export interface InspectionAssetCheckGroup {
+  asset_type: string;
+  asset_type_label?: string | null;
+  checks: InspectionAssetCheck[];
+  total: number;
+  tested_count: number;
+  passed_count: number;
+}
+
 // === Inspection Area Types ===
 
 export interface InspectionArea {
   id: string;
-  inspection_id: number;
+  inspection_id: string;
   parent_id?: string;
   children_count?: number;
   name: string;
@@ -402,7 +450,7 @@ export interface UpdateInspectionElementData {
 
 export interface Defect {
   id: string;
-  inspection_id: number;
+  inspection_id: string;
   defectable_type: DefectableType;
   defectable_id: string;
   title: string;
@@ -451,7 +499,7 @@ export interface UpdateDefectData {
 
 export interface MeterReading {
   id: string;
-  inspection_id: number;
+  inspection_id: string;
   meter_type: MeterType;
   meter_location?: string;
   meter_serial?: string;
@@ -495,7 +543,7 @@ export interface UpdateMeterReadingData {
 
 export interface KeyFob {
   id: string;
-  inspection_id: number;
+  inspection_id: string;
   item_type: KeyFobType;
   description?: string;
   quantity: number;
@@ -529,22 +577,22 @@ export interface UpdateKeyFobData {
 // === Compliance Types ===
 
 export interface ComplianceForm {
-  id: number;
+  id: string;
   name: string;
   description?: string;
   category?: string;
   order?: number;
   sections?: ComplianceSection[];
-  inspection_id?: number;
-  original_form_id?: number;
-  team_id?: number;
+  inspection_id?: string;
+  original_form_id?: string;
+  team_id?: string;
   is_published?: boolean;
   created_at: string;
   updated_at: string;
 }
 
 export interface ComplianceSection {
-  id: number;
+  id: string;
   name: string;
   description?: string;
   order: number;
@@ -557,7 +605,7 @@ export interface ComplianceSection {
 }
 
 export interface ComplianceField {
-  id: number;
+  id: string;
   label: string;
   field_type: string;
   help_text?: string;
@@ -577,23 +625,23 @@ export interface ComplianceField {
 }
 
 export interface ComplianceResponse {
-  id: number;
-  inspection_id: number;
-  inspection_field_id: number;
+  id: string;
+  inspection_id: string;
+  inspection_field_id: string;
   section_instance?: number;
   value_type: string;
   value: any;
-  file?: { id: number; name: string; url: string; mime_type: string; size: number };
+  file?: { id: string; name: string; url: string; mime_type: string; size: number };
   is_auto_populated: boolean;
   created_at: string;
   updated_at: string;
 }
 
 export interface ComplianceSectionInstance {
-  id: number;
-  inspection_id: number;
-  inspection_compliance_form_id: number;
-  section_id: number;
+  id: string;
+  inspection_id: string;
+  inspection_compliance_form_id: string;
+  section_id: string;
   instance_number: number;
   instance_label?: string;
   order: number;
@@ -605,8 +653,8 @@ export interface ComplianceSectionInstance {
 // === Branch Types ===
 
 export interface Branch {
-  id: number;
-  team_id: number;
+  id: string;
+  team_id: string;
   name: string;
   slug?: string;
   is_default?: boolean;
@@ -621,10 +669,86 @@ export interface Branch {
   updated_at: string;
 }
 
+// === Client Types ===
+
+export interface ClientLogo {
+  id: string;
+  url: string;
+  thumbnail_url?: string;
+}
+
+export interface Client {
+  id: string;
+  name: string;
+  kind?: string | null;
+  is_active: boolean;
+  group_id?: string | null;
+  group?: ClientGroup;
+  default_branch_id?: string | null;
+  default_branch?: Branch;
+  branches?: Branch[];
+  default_inspection_depth?: string | null;
+  logo: ClientLogo | null;
+  properties_count?: number;
+  inspections_count?: number;
+  /** Only returned to Team tokens and users with clients.manage. */
+  contact?: { name?: string | null; email?: string | null; phone?: string | null };
+  /** Only returned to Team tokens and users with clients.manage. */
+  delivery?: { method?: string | null; email?: string | null; paused: boolean };
+  /** Only returned to Team tokens and users with clients.manage. */
+  notes?: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface ClientGroup {
+  id: string;
+  name: string;
+  type?: string | null;
+  color?: string | null;
+  website?: string | null;
+  logo: ClientLogo | null;
+  clients_count?: number;
+  properties_count?: number;
+  inspections_count?: number;
+  clients?: Client[];
+  created_at: string;
+  updated_at: string;
+}
+
+export interface ClientListParams extends ListParams {
+  /** "mine" or "all" ("all" requires clients.manage). */
+  scope?: 'mine' | 'all';
+}
+
+// === Hazard / Vocabulary Sync Types ===
+
+export interface HazardRule {
+  type: string;
+  label: string;
+  in_force_from: string;
+  investigate_days: number;
+  summary_days: number;
+  work_days: number;
+}
+
+export interface HazardSync {
+  hazard_wordings: any[];
+  nations: Array<{ nation: string; hazards: HazardRule[] }>;
+  excluded_property_types: string[];
+  not_hazards: string[];
+  last_sync: string;
+}
+
+export interface VocabularySync {
+  version: string;
+  vocabulary: Record<string, any>;
+}
+
 // === Template Types ===
 
 export interface PropertyTemplate {
-  id: number;
+  id: string;
   name: string;
   description?: string;
   property_type?: PropertyType;
@@ -638,13 +762,13 @@ export interface PropertyTemplate {
 // === Component Types ===
 
 export interface Component {
-  id: number;
+  id: string;
   name: string;
   category?: string;
   description?: string;
   order?: number;
   is_default: boolean;
-  parent_id?: number;
+  parent_id?: string;
   type?: string;
   children?: Component[];
   items?: Component[];
@@ -695,7 +819,7 @@ export interface Team {
 // === User Types ===
 
 export interface User {
-  id: number;
+  id: string;
   first_name: string;
   last_name: string;
   full_name: string;
@@ -703,7 +827,7 @@ export interface User {
   email: string;
   avatar?: string;
   email_verified_at?: string;
-  current_team_id: number;
+  current_team_id: string;
   two_factor_enabled: boolean;
   current_team?: Team;
   team_membership?: { role: string; is_owner: boolean; is_manager: boolean };
@@ -742,7 +866,7 @@ export interface Stats {
 // === Phrase Types ===
 
 export interface Phrase {
-  id: number;
+  id: string;
   text: string;
   category: PhraseCategory;
   context?: string;
@@ -760,7 +884,7 @@ export interface CreatePhraseData {
 // === Modifier Types ===
 
 export interface Modifier {
-  id: number;
+  id: string;
   type: ModifierType;
   value: string;
   category?: string;
@@ -775,10 +899,11 @@ export interface CreateCustomModifierData {
   category?: string;
 }
 
-// === AI Mode Types ===
+// === Scribe Types ===
 
 export interface AiStatus {
   enabled: boolean;
+  policy?: ScribePolicy;
   processing_status?: string;
   photos_to_process?: number;
   photos_processed?: number;

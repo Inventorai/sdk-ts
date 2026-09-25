@@ -27,3 +27,6 @@ export { Phrases } from './resources/phrases';
 export { Modifiers } from './resources/modifiers';
 export { Scheduler } from './resources/scheduler';
 export { TeamResource } from './resources/team';
+export { Clients } from './resources/clients';
+export { Hazards } from './resources/hazards';
+export { Vocabulary } from './resources/vocabulary';

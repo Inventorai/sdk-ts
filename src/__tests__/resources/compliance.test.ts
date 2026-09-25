@@ -43,7 +43,19 @@ describe('Compliance', () => {
     });
   });
 
+  describe('removeSectionCopy', () => {
+    it('calls DELETE /inspections/:id/compliance/fields/:fieldId/instances/:n', async () => {
+      await compliance.removeSectionCopy(1, 42, 2);
+      expect(mockHttp.delete).toHaveBeenCalledWith('/inspections/1/compliance/fields/42/instances/2');
+    });
+  });
+
   describe('updateResponse', () => {
+    it('sends notes with the value', async () => {
+      await compliance.updateResponse(1, 42, { value: 'Yes', notes: 'Checked' });
+      expect(mockHttp.patch).toHaveBeenCalledWith('/inspections/1/compliance/fields/42', { value: 'Yes', notes: 'Checked' });
+    });
+
     it('calls PATCH /inspections/:id/compliance/fields/:fieldId with data', async () => {
       const data = { value: 'Yes', section_instance: 1 };
       await compliance.updateResponse(1, 42, data);
@@ -75,7 +87,7 @@ describe('Compliance', () => {
 
   describe('addSectionInstance', () => {
     it('calls POST /inspections/:id/compliance/section-instance with data', async () => {
-      const data = { form_id: 10, section_id: 20 };
+      const data = { form_id: '01FORM', section_id: '01SECT' };
       await compliance.addSectionInstance(1, data);
       expect(mockHttp.post).toHaveBeenCalledWith('/inspections/1/compliance/section-instance', data);
     });

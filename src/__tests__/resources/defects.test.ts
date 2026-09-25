@@ -75,7 +75,7 @@ describe('Defects', () => {
 
   describe('update', () => {
     it('calls PATCH /inspections/:id/defects/:defectId with data', async () => {
-      const data = { title: 'Updated title', severity: 'major' as const };
+      const data = { title: 'Updated title', severity: 'high' as const };
       await defects.update(1, 'defect-uuid', data);
       expect(mockHttp.patch).toHaveBeenCalledWith('/inspections/1/defects/defect-uuid', data);
     });

@@ -21,6 +21,9 @@ import { Phrases } from './resources/phrases';
 import { Modifiers } from './resources/modifiers';
 import { Scheduler } from './resources/scheduler';
 import { TeamResource } from './resources/team';
+import { Clients } from './resources/clients';
+import { Hazards } from './resources/hazards';
+import { Vocabulary } from './resources/vocabulary';
 
 export interface InventoraiClientOptions {
   apiToken: string;
@@ -52,6 +55,9 @@ export class InventoraiClient {
   public modifiers: Modifiers;
   public scheduler: Scheduler;
   public team: TeamResource;
+  public clients: Clients;
+  public hazards: Hazards;
+  public vocabulary: Vocabulary;
 
   constructor(options: InventoraiClientOptions) {
     const baseURL = options.baseURL || 'https://api.inventorai.co.uk/v1/team';
@@ -79,5 +85,8 @@ export class InventoraiClient {
     this.modifiers = new Modifiers(this.httpClient);
     this.scheduler = new Scheduler(this.httpClient);
     this.team = new TeamResource(this.httpClient);
+    this.clients = new Clients(this.httpClient);
+    this.hazards = new Hazards(this.httpClient);
+    this.vocabulary = new Vocabulary(this.httpClient);
   }
 }

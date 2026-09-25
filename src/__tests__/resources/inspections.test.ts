@@ -51,7 +51,7 @@ describe('Inspections', () => {
   describe('create', () => {
     it('calls POST /inspections with data', async () => {
       const data = {
-        property_id: 1,
+        property_id: "01PROP",
         type: 'move_in' as const,
         scheduled_at: '2026-04-01',
       };

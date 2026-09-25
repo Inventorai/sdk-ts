@@ -16,7 +16,7 @@ export class Compliance {
     return this.http.post(`/inspections/${inspectionId}/compliance/attach-multiple`, { form_ids: formIds });
   }
 
-  async updateResponse(inspectionId: number | string, fieldId: number | string, data: { value: any; section_instance?: number }): Promise<any> {
+  async updateResponse(inspectionId: number | string, fieldId: number | string, data: { value?: any; section_instance?: number | null; notes?: string | null }): Promise<any> {
     return this.http.patch(`/inspections/${inspectionId}/compliance/fields/${fieldId}`, data);
   }
 
@@ -28,12 +28,16 @@ export class Compliance {
     return this.http.upload(`/inspections/${inspectionId}/compliance/upload`, file, 'file');
   }
 
-  async addSectionInstance(inspectionId: number | string, data: { form_id: number; section_id: number }): Promise<any> {
+  async addSectionInstance(inspectionId: number | string, data: { form_id: string; section_id: string }): Promise<any> {
     return this.http.post(`/inspections/${inspectionId}/compliance/section-instance`, data);
   }
 
   async removeSectionInstance(inspectionId: number | string, instanceId: number | string): Promise<void> {
     return this.http.delete(`/inspections/${inspectionId}/compliance/section-instance/${instanceId}`);
+  }
+
+  async removeSectionCopy(inspectionId: number | string, fieldId: number | string, instanceNumber: number): Promise<void> {
+    return this.http.delete(`/inspections/${inspectionId}/compliance/fields/${fieldId}/instances/${instanceNumber}`);
   }
 
   async summary(inspectionId: number | string): Promise<any> {

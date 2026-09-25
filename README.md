@@ -70,7 +70,7 @@ const properties = await client.properties.list({
 });
 
 // Get single property
-const property = await client.properties.get(123, {
+const property = await client.properties.get('01HZW4N8R7Q5K3JX0V9PT6S2P1', {
   include: ['landlord', 'inspections']
 });
 
@@ -80,15 +80,16 @@ const newProperty = await client.properties.create({
   postcode: 'SW1A 2AA',
   country: 'GB',
   property_type: 'house',
+  is_hmo: false,
   is_residential: true
 });
 
 // Get active tenancy
-const tenancy = await client.properties.activeTenancy(123);
+const tenancy = await client.properties.activeTenancy('01HZW4N8R7Q5K3JX0V9PT6S2P1');
 
 // Upload / delete cover image
-await client.properties.uploadCoverImage(123, imageFile);
-await client.properties.deleteCoverImage(123);
+await client.properties.uploadCoverImage('01HZW4N8R7Q5K3JX0V9PT6S2P1', imageFile);
+await client.properties.deleteCoverImage('01HZW4N8R7Q5K3JX0V9PT6S2P1');
 ```
 
 ### Inspections
@@ -96,22 +97,22 @@ await client.properties.deleteCoverImage(123);
 ```typescript
 // List inspections
 const inspections = await client.inspections.list({
-  filter: { property_id: '123', status: 'scheduled' }
+  filter: { property_id: '01HZW4N8R7Q5K3JX0V9PT6S2P1', status: 'draft' }
 });
 
 // Create an inspection
 const inspection = await client.inspections.create({
-  property_id: 123,
+  property_id: '01HZW4N8R7Q5K3JX0V9PT6S2P1',
   type: 'move_in',
   scheduled_at: '2026-04-01',
-  ai_mode_enabled: true
+  scribe_enabled: true
 });
 
 // Create with offline-built ULID + nested tree (sync a full structure in one call,
 // reusing your own row IDs so offline mutations stay valid post-sync)
 const offlineInspection = await client.inspections.create({
   id: '01HZW4N8R7Q5K3JX0V9PT6S2EM',
-  property_id: 123,
+  property_id: '01HZW4N8R7Q5K3JX0V9PT6S2P1',
   type: 'periodic',
   scheduled_end_at: '2026-04-01T11:00:00Z',
   areas: [{
@@ -127,8 +128,8 @@ const offlineInspection = await client.inspections.create({
 
 // Initialize from a property template (async server-side expansion)
 await client.inspections.initialize({
-  property_id: 123,
-  template_id: 7,
+  property_id: '01HZW4N8R7Q5K3JX0V9PT6S2P1',
+  template_id: '01HZW4N8R7Q5K3JX0V9PT6S2T1',
   type: 'move_in'
 });
 
@@ -164,8 +165,8 @@ await client.inspections.reopen(456);            // reopen a finalised inspectio
 await client.inspections.delete(456);
 
 // Check existing / comparable
-const existing = await client.inspections.checkExisting({ property_id: 123, type: 'move_in' });
-const comparable = await client.inspections.comparable({ property_id: 123 });
+const existing = await client.inspections.checkExisting({ property_id: '01HZW4N8R7Q5K3JX0V9PT6S2P1', type: 'move_in' });
+const comparable = await client.inspections.comparable({ property_id: '01HZW4N8R7Q5K3JX0V9PT6S2P1' });
 ```
 
 ### Inspection Areas
@@ -224,11 +225,11 @@ const defect = await client.defects.create(inspectionId, {
 });
 
 // Contextual creation
-await client.defects.createForArea(inspectionId, areaId, { title: 'Damp patch', severity: 'major' });
-await client.defects.createForItem(inspectionId, itemId, { title: 'Broken handle', severity: 'moderate', item_label: 'Right side' });
-await client.defects.createForElement(inspectionId, elementId, { title: 'Stain', severity: 'cosmetic' });
+await client.defects.createForArea(inspectionId, areaId, { title: 'Damp patch', severity: 'high' });
+await client.defects.createForItem(inspectionId, itemId, { title: 'Broken handle', severity: 'medium', item_label: 'Right side' });
+await client.defects.createForElement(inspectionId, elementId, { title: 'Stain', severity: 'low' });
 
-await client.defects.update(inspectionId, defectId, { status: 'fixed' });
+await client.defects.update(inspectionId, defectId, { status: 'completed' });
 await client.defects.delete(inspectionId, defectId);
 await client.defects.uploadPhoto(inspectionId, defectId, photoFile);
 ```
@@ -269,12 +270,13 @@ await client.compliance.attachMultiple(inspectionId, [formId1, formId2]);
 await client.compliance.detach(inspectionId, formId);
 
 // Update responses
-await client.compliance.updateResponse(inspectionId, fieldId, { value: 'Yes' });
+await client.compliance.updateResponse(inspectionId, fieldId, { value: 'Yes', notes: 'Checked at the meter' });
+await client.compliance.removeSectionCopy(inspectionId, fieldId, 2);
 await client.compliance.batchUpdateResponses(inspectionId, { 1: 'Yes', 2: 'No' });
 
 // File uploads & section instances
 await client.compliance.uploadFile(inspectionId, file);
-await client.compliance.addSectionInstance(inspectionId, { form_id: 1, section_id: 2 });
+await client.compliance.addSectionInstance(inspectionId, { form_id: formId, section_id: sectionId });
 await client.compliance.removeSectionInstance(inspectionId, instanceId);
 
 // Summary
@@ -368,6 +370,22 @@ await client.phrases.learn({ descriptions: ['Freshly painted walls'] });
 const phraseStats = await client.phrases.stats();
 ```
 
+### Clients
+
+```typescript
+const clients = await client.clients.list({ scope: 'all', include: 'group' });
+const one = await client.clients.get(clientId, { include: ['group', 'branches'] });
+const groups = await client.clients.groups({ include: 'clients' });
+const group = await client.clients.group(groupId);
+```
+
+### Hazards and Vocabulary
+
+```typescript
+const hazards = await client.hazards.sync();
+const vocabulary = await client.vocabulary.sync();
+```
+
 ### Modifiers
 
 ```typescript
@@ -437,7 +455,7 @@ const properties = await client.properties.list({
 
 ### Including Relationships
 ```typescript
-const property = await client.properties.get(123, {
+const property = await client.properties.get('01HZW4N8R7Q5K3JX0V9PT6S2P1', {
   include: ['landlord', 'inspections']
 });
 ```
