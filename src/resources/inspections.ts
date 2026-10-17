@@ -1,10 +1,12 @@
 import { HttpClient } from '../http/client';
-import { Inspection, CreateInspectionData, RescheduleInspectionData, FinalizeInspectionData, PaginatedResponse, ListParams } from '../types';
+import { Inspection, CreateInspectionData, RescheduleInspectionData, FinalizeInspectionData, PaginatedResponse, InspectionListParams, InspectionGroupBy, GroupedInspectionsResponse } from '../types';
 
 export class Inspections {
   constructor(private http: HttpClient) {}
 
-  async list(params: ListParams = {}): Promise<PaginatedResponse<Inspection>> {
+  async list(params: InspectionListParams & { group_by: InspectionGroupBy }): Promise<GroupedInspectionsResponse>;
+  async list(params?: InspectionListParams): Promise<PaginatedResponse<Inspection>>;
+  async list(params: InspectionListParams = {}): Promise<PaginatedResponse<Inspection> | GroupedInspectionsResponse> {
     return this.http.get('/inspections', params);
   }
 

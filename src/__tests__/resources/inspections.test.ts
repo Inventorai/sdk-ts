@@ -19,6 +19,10 @@ describe('Inspections', () => {
   });
 
   describe('list', () => {
+    it('passes group_by to GET /inspections', async () => {
+      await inspections.list({ group_by: 'inspector', page: 2 });
+      expect(mockHttp.get).toHaveBeenCalledWith('/inspections', { group_by: 'inspector', page: 2 });
+    });
     it('calls GET /inspections with default empty params', async () => {
       await inspections.list();
       expect(mockHttp.get).toHaveBeenCalledWith('/inspections', {});

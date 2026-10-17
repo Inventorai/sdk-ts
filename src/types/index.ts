@@ -144,7 +144,7 @@ export interface Inspection {
   property?: Property;
   client_id?: string | null;
   client?: Client;
-  inspector?: { id: string; name: string; email: string };
+  inspector?: { id: string; name: string; email: string; avatar: string | null; initials: string };
   type: InspectionType;
   status: InspectionStatus;
   is_archived: boolean;
@@ -943,4 +943,75 @@ export interface ListParams {
   sort?: string;
   per_page?: number;
   page?: number;
+}
+
+// === Grouped List Types ===
+
+export type PropertyGroupBy = 'branch' | 'landlord' | 'client' | 'client_group' | 'property_type' | 'inspection';
+
+export type InspectionGroupBy = 'branch' | 'inspector';
+
+export interface PropertyListParams extends ListParams {
+  /** Order the rows by group and return them in `grouped` as well as `data`. */
+  group_by?: PropertyGroupBy;
+}
+
+export interface InspectionListParams extends ListParams {
+  /** Order the rows by group and return them in `grouped` as well as `data`. */
+  group_by?: InspectionGroupBy;
+}
+
+/**
+ * One group's slice of a grouped page. Rows are ordered by group before they
+ * are paged, so a group larger than a page carries on to the next one.
+ */
+export interface ResultGroup {
+  /** The group's label, e.g. a branch name, "No branch" or "Unassigned". */
+  group_name: string;
+  /** The group's full total, not just the rows on this page. */
+  count: number;
+  /** 1-based position of this page's first row within the group. */
+  showing_from: number;
+  /** 1-based position of this page's last row within the group. */
+  showing_to: number;
+  /** True when the group started on an earlier page. */
+  continued: boolean;
+}
+
+export interface GroupedResponseMeta {
+  current_page: number;
+  last_page: number;
+  per_page: number;
+  total_groups: number;
+  groups_on_page: number;
+}
+
+export interface GroupedPropertiesResponse {
+  /** The page's rows in group order. */
+  data: Property[];
+  grouped: (ResultGroup & { properties: Property[] })[];
+  meta: GroupedResponseMeta & {
+    group_by: PropertyGroupBy;
+    total_properties: number;
+    properties_on_page: number;
+  };
+  links: PaginatedResponse<Property>['links'];
+}
+
+export interface GroupedInspectionsResponse {
+  /** The page's rows in group order. */
+  data: Inspection[];
+  grouped: (ResultGroup & {
+    inspections: Inspection[];
+    /** The inspector's avatar when grouped by inspector, otherwise null. */
+    avatar: string | null;
+    /** The inspector's initials when grouped by inspector, otherwise null. */
+    initials: string | null;
+  })[];
+  meta: GroupedResponseMeta & {
+    group_by: InspectionGroupBy;
+    total_inspections: number;
+    inspections_on_page: number;
+  };
+  links: PaginatedResponse<Inspection>['links'];
 }

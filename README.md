@@ -69,6 +69,14 @@ const properties = await client.properties.list({
   per_page: 50
 });
 
+// Group by branch (or landlord, client, client_group, property_type, inspection).
+// Rows are ordered by group before paging, and `grouped` holds this page's
+// slice of each group; `continued` is true when a group began on an earlier page.
+const byBranch = await client.properties.list({ group_by: 'branch', per_page: 25 });
+for (const group of byBranch.grouped) {
+  console.log(`${group.group_name} (${group.count})`, group.properties.length);
+}
+
 // Get single property
 const property = await client.properties.get('01HZW4N8R7Q5K3JX0V9PT6S2P1', {
   include: ['landlord', 'inspections']
@@ -99,6 +107,11 @@ await client.properties.deleteCoverImage('01HZW4N8R7Q5K3JX0V9PT6S2P1');
 const inspections = await client.inspections.list({
   filter: { property_id: '01HZW4N8R7Q5K3JX0V9PT6S2P1', status: 'draft' }
 });
+
+// Group by inspector or branch; inspector groups carry the inspector's
+// avatar and initials, and each inspection's inspector has them too
+const byInspector = await client.inspections.list({ group_by: 'inspector', include: ['property', 'inspector'] });
+byInspector.grouped.forEach((group) => console.log(group.group_name, group.avatar, group.count));
 
 // Create an inspection
 const inspection = await client.inspections.create({

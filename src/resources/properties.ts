@@ -1,10 +1,12 @@
 import { HttpClient } from '../http/client';
-import { Property, CreatePropertyData, PaginatedResponse, ListParams } from '../types';
+import { Property, CreatePropertyData, PaginatedResponse, PropertyListParams, PropertyGroupBy, GroupedPropertiesResponse } from '../types';
 
 export class Properties {
   constructor(private http: HttpClient) {}
 
-  async list(params: ListParams = {}): Promise<PaginatedResponse<Property>> {
+  async list(params: PropertyListParams & { group_by: PropertyGroupBy }): Promise<GroupedPropertiesResponse>;
+  async list(params?: PropertyListParams): Promise<PaginatedResponse<Property>>;
+  async list(params: PropertyListParams = {}): Promise<PaginatedResponse<Property> | GroupedPropertiesResponse> {
     return this.http.get('/properties', params);
   }
 
