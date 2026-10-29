@@ -673,7 +673,7 @@ export interface Branch {
 
 export interface ClientLogo {
   id: string;
-  url: string;
+  url: string | null;
   thumbnail_url?: string;
 }
 
